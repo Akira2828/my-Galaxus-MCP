@@ -1,0 +1,37 @@
+name: Galaxus Preise prüfen
+
+on:
+  schedule:
+    # 08:00 und 17:00 UTC = 09:00 und 18:00 Zürich (Winterzeit)
+    - cron: "0 8,17 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  pruefen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node tracker.mjs
+      - name: Verlauf speichern
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add preisverlauf.json
+          git diff --cached --quiet || git commit -m "Preisverlauf aktualisiert"
+          git push
+      - name: Per E-Mail melden (neues Issue)
+        if: hashFiles('meldungen.md') != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --title "Galaxus: Preis gesunken ($(TZ=Europe/Zurich date '+%d.%m.%Y %H:%M'))" \
+            --body-file meldungen.md \
+            --assignee "${{ github.repository_owner }}"
