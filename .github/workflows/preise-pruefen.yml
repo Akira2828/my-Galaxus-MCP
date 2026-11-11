@@ -27,8 +27,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
-          git add preisverlauf.json
-          git diff --cached --quiet || git commit -m "Preisverlauf aktualisiert"
+          git add preisverlauf.json README.md
+          git diff --cached --quiet || git commit -m "Preise aktualisiert"
           git push
       - name: Per E-Mail melden (neues Issue)
         if: hashFiles('meldungen.md') != ''

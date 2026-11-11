@@ -7,6 +7,7 @@ const MCP_URL = "https://mcp.galaxus.ch/";
 const MERKLISTE = "merkliste.json";
 const VERLAUF = "preisverlauf.json";
 const MELDUNGEN = "meldungen.md";
+const UEBERSICHT = "README.md";
 
 let sessionId = null;
 let rpcId = 0;
@@ -45,6 +46,56 @@ async function sucheProdukte(query) {
 const chf = (n) => `CHF ${Number(n).toFixed(2)}`;
 const jetzt = () =>
   new Date().toLocaleString("sv-SE", { timeZone: "Europe/Zurich" }).slice(0, 16);
+
+// Übersichtsseite (README.md), die GitHub auf der Startseite des Repos anzeigt
+function uebersicht(merkliste, verlauf) {
+  const zeilen = [
+    "# Galaxus Preis-Tracker",
+    "",
+    `Zuletzt geprüft: **${jetzt()}** · Prüfung täglich 09:00 und 18:00 · [Anleitung](LIESMICH.md)`,
+    "",
+    "| Produkt | Aktuell | Vorher | Tiefstpreis | Höchstpreis | Wunschpreis |",
+    "|---|---:|---:|---:|---:|---:|",
+  ];
+  const kurven = [];
+  for (const p of merkliste.produkte) {
+    const preise = verlauf[p.id]?.preise ?? [];
+    if (!preise.length) {
+      zeilen.push(`| [${p.name}](${p.url}) | – | – | – | – | ${p.wunschpreis ? chf(p.wunschpreis) : "–"} |`);
+      continue;
+    }
+    const werte = preise.map((e) => e.preis);
+    const aktuell = werte.at(-1);
+    const vorher = werte.length > 1 ? werte.at(-2) : null;
+    const pfeil = vorher == null || aktuell === vorher ? "" : aktuell < vorher ? " 🟢" : " 🔴";
+    const tiefst = Math.min(...werte);
+    zeilen.push(
+      `| [${p.name}](${p.url}) | **${chf(aktuell)}**${pfeil} | ${vorher != null ? chf(vorher) : "–"} | ${chf(tiefst)}${aktuell === tiefst ? " ⭐" : ""} | ${chf(Math.max(...werte))} | ${p.wunschpreis ? chf(p.wunschpreis) : "–"} |`,
+    );
+
+    // Pro Tag den letzten Preis, höchstens 60 Tage, damit die Kurve lesbar bleibt
+    const proTag = new Map();
+    for (const e of preise) proTag.set(e.datum.slice(0, 10), e.preis);
+    const tage = [...proTag].slice(-60);
+    const min = Math.min(...tage.map(([, v]) => v));
+    const max = Math.max(...tage.map(([, v]) => v));
+    const rand = Math.max(1, (max - min) * 0.2);
+    kurven.push(
+      `### ${p.name}`,
+      "",
+      "```mermaid",
+      "xychart-beta",
+      `  x-axis [${tage.map(([d]) => `"${d.slice(8, 10)}.${d.slice(5, 7)}."`).join(", ")}]`,
+      `  y-axis "CHF" ${Math.max(0, Math.floor(min - rand))} --> ${Math.ceil(max + rand)}`,
+      `  line [${tage.map(([, v]) => v).join(", ")}]`,
+      "```",
+      "",
+    );
+  }
+  zeilen.push("", "🟢 günstiger als zuletzt · 🔴 teurer als zuletzt · ⭐ aktuell Tiefstpreis", "");
+  if (kurven.length) zeilen.push("## Preisverlauf", "", ...kurven);
+  return zeilen.join("\n");
+}
 
 async function main() {
   const merkliste = JSON.parse(await readFile(MERKLISTE, "utf8"));
@@ -90,6 +141,7 @@ async function main() {
   }
 
   await writeFile(VERLAUF, JSON.stringify(verlauf, null, 2) + "\n");
+  await writeFile(UEBERSICHT, uebersicht(merkliste, verlauf));
   if (meldungen.length) {
     await writeFile(MELDUNGEN, meldungen.join("\n\n") + "\n");
     console.log(`${meldungen.length} Meldung(en) geschrieben.`);
