@@ -5,6 +5,10 @@ on:
     # 08:00 und 17:00 UTC = 09:00 und 18:00 Zürich (Winterzeit)
     - cron: "0 8,17 * * *"
   workflow_dispatch:
+  # Sofort prüfen, wenn die Merkliste geändert wird
+  push:
+    branches: [main]
+    paths: [merkliste.json, tracker.mjs, .github/workflows/preise-pruefen.yml]
 
 permissions:
   contents: write
