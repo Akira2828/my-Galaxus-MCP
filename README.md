@@ -1,6 +1,6 @@
 # Galaxus Preis-Tracker
 
-Zuletzt geprüft: **2026-11-13 23:25** · Prüfung täglich 09:00 und 18:00 · [Anleitung](LIESMICH.md)
+Zuletzt geprüft: **2026-11-14 15:52** · Prüfung täglich 09:00 und 18:00 · [Anleitung](LIESMICH.md)
 
 | Produkt | Aktuell | Vorher | Tiefstpreis | Höchstpreis | Wunschpreis |
 |---|---:|---:|---:|---:|---:|
@@ -15,16 +15,16 @@ Zuletzt geprüft: **2026-11-13 23:25** · Prüfung täglich 09:00 und 18:00 · [
 
 ```mermaid
 xychart-beta
-  x-axis ["11.11.", "12.11.", "13.11."]
+  x-axis ["11.11.", "12.11.", "13.11.", "14.11."]
   y-axis "CHF" 26 --> 29
-  line [27.9, 27.9, 27.9]
+  line [27.9, 27.9, 27.9, 27.9]
 ```
 
 ### ESN Isoclear Eistee (908 g)
 
 ```mermaid
 xychart-beta
-  x-axis ["11.11.", "12.11.", "13.11."]
+  x-axis ["11.11.", "12.11.", "13.11.", "14.11."]
   y-axis "CHF" 56 --> 60
-  line [57.9, 58.9, 58.9]
+  line [57.9, 58.9, 58.9, 58.9]
 ```
