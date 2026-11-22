@@ -1,6 +1,6 @@
 # Galaxus Preis-Tracker
 
-Zuletzt geprüft: **2026-11-22 17:04** · Prüfung täglich 09:00 und 18:00 · [Anleitung](LIESMICH.md)
+Zuletzt geprüft: **2026-11-22 23:21** · Prüfung täglich 09:00 und 18:00 · [Anleitung](LIESMICH.md)
 
 | Produkt | Aktuell | Vorher | Tiefstpreis | Höchstpreis | Wunschpreis |
 |---|---:|---:|---:|---:|---:|
